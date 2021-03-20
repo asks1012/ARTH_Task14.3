@@ -1,0 +1,29 @@
+- hosts: 192.168.43.71
+  vars_files:
+  - "{{ ansible_facts['distribution'] }}{{ ansible_facts['distribution_version'] }}.yml"
+  tasks:
+  - name: "Printing the Distribution of Target Node"
+    debug:
+      var: ansible_facts["distribution"]
+  - name: "Printing the Distribution Version of Target Node"
+    debug:
+      var: ansible_facts["distribution_version"]
+  - name: "Installing the software {{ software_name }}"
+    package:
+      name: "{{ software_name }}"
+      state: present
+  - name: "Starting the service {{ service_name }}"
+    service:
+      name: "{{ service_name }}"
+      state: started
+      enabled: yes
+  - name: "Copying the html file Content to the Document Root {{ document_root }}"
+    copy:
+      content: "<h1>This is the server on Distribution: {{ansible_facts['distribution']}}, Version: {{ansible_facts['distribution_version']}}</h1>"
+      dest: "{{ document_root }}/index.html"
+  - name: "Enabling port 80 on Firewall"
+    firewalld:
+      port: 80/tcp
+      state: enabled
+      permanent: yes
+      immediate: yes
